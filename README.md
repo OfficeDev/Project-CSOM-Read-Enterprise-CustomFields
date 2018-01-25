@@ -9,14 +9,14 @@ Users typically access ECFs by viewing the Project Details page for a specific p
 As a Project/Program/Portfolio portfolio manager, I would like to use an app that displays the custom values my company has associated with our projects.
 
 
-### Using App
+## Using the app
 
-1.	Add the Project CSOM client package [here](https://www.nuget.org/packages/Microsoft.SharePointOnline.CSOM/)
-2.	Update the PWA site
+1.	Add the Project CSOM client package [here](https://www.nuget.org/packages/Microsoft.SharePointOnline.CSOM/).
+2.	Update the PWA site.
 3.	Update the login/password to your PWA site.
-4.	Run the app
+4.	Run the app.
 
-### Prerequisites
+## Prerequisites
 To use this code sample, you need the following:
 
 * PWA Site (Project Online, Project Server 2013 or Project Server 2016)
