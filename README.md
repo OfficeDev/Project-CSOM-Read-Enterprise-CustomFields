@@ -1,3 +1,14 @@
+---
+topic: sample
+products:
+- Project
+- Office 365
+languages:
+- C#
+extensions:
+  contentType: samples
+  createdDate: 8/15/2016 12:57:18 PM
+---
 # Project CSOM Read Enterprise CustomFields
 
 The Project CSOM Read Enterprise CustomFields sample uses C# and Project CSOM to demonstrate how to read enterprise custom fields (ECFs) that are defined at the Project Online Web App (PWA) instance and read the ECFs that are defined in each project.
