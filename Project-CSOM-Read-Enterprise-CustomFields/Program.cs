@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security;
 using Microsoft.ProjectServer.Client;
 using Microsoft.SharePoint.Client;
@@ -15,8 +16,10 @@ namespace ProjectCSOMReadEnterpriseCustomFields
     {
         const int PROJECT_BLOCK_SIZE = 20;
 
+        private static readonly string SiteUrl = "https://contoso.sharepoint.com/sites/pwa";
+
         private static ProjectContext projContext =
-            new ProjectContext("https://contoso.sharepoint.com/sites/pwa");
+            new ProjectContext(SiteUrl);
 
         //Dictionary of ECFs uses FieldType to drive processing of the custom fields
         static Dictionary<String, CustomField> pwaECF = new Dictionary<string, CustomField>();
@@ -25,16 +28,17 @@ namespace ProjectCSOMReadEnterpriseCustomFields
         {
             using (projContext)
             {
-                // User credentials
+                // Get login cookie using WebLogin
+                var cookies = WebLogin.GetWebLoginCookie(new Uri(SiteUrl));
 
-                SecureString passWord = new SecureString();
-                foreach (char c in "password".ToCharArray()) passWord.AppendChar(c);
-
-                projContext.Credentials = new SharePointOnlineCredentials("sarad@contoso.onmicrosoft.com", passWord);
+                projContext.ExecutingWebRequest += delegate (object sender, WebRequestEventArgs e)
+                {
+                    e.WebRequestExecutor.WebRequest.CookieContainer = new CookieContainer();
+                    e.WebRequestExecutor.WebRequest.CookieContainer.SetCookies(new Uri(SiteUrl), cookies);
+                };
 
                 // 1. List the defined Enterprise Custom Fields in the PWA instance.
                 ListPWACustomFields();
-
 
                 // 2. Get project list with minimal information
                 projContext.Load(projContext.Projects, qp => qp.Include(qr => qr.Id));
@@ -140,18 +144,19 @@ namespace ProjectCSOMReadEnterpriseCustomFields
 
                                 String[] entries = (String[])ECFValues[cf.InternalName];
 
-                                foreach (String entry in entries)
+                                if (entries != null)
                                 {
-                                    var luEntry = projContext.LoadQuery(cf.LookupTable.Entries
-                                            .Where(e => e.InternalName == entry));
+                                    foreach (String entry in entries)
+                                    {
+                                        var luEntry = projContext.LoadQuery(cf.LookupTable.Entries
+                                                .Where(e => e.InternalName == entry));
 
-                                    projContext.ExecuteQuery();
+                                        projContext.ExecuteQuery();
 
-                                    Console.WriteLine(" Yes    {0, -22}  {1}", luEntry.First().FullValue, luEntry.First().Description);
+                                        Console.WriteLine(" Yes    {0, -22}  {1}", luEntry.First().FullValue, luEntry.First().Description);
+                                    }
                                 }
                             }
-
-
                         }
 
                         Console.WriteLine("     ------------------------------------------------------------------------\n");
